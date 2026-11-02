@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chats</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Chats</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Chatroom ID</th>
+        <th>Match ID</th>
+        <th>Sender Name</th>
+        <th>Receiver Name</th>
+        <th>Content</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="chatTable"></tbody>
+  </table>
+
+  <script>
+    fetch("http://127.0.0.1:5000/chat_messages")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("chatTable");
+        tbody.innerHTML = ""; // clear previous rows
+        data.forEach(c => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${c.CHATROOM_ID}</td>
+            <td>${c.M_ID}</td>
+            <td>${c.SENDER_NAME}</td>
+            <td>${c.RECEIVER_NAME}</td>
+            <td>${c.CONTENT}</td>
+            <td>${c.CHAT_TIMESTAMP}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(err => console.error("Failed to load chat messages:", err));
+  </script>
+</body>
+</html>

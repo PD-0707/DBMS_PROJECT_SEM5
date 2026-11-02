@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Interests</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>User Interests</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Interest ID</th>
+        <th>User ID</th>
+        <th>Interest</th>
+      </tr>
+    </thead>
+    <tbody id="intTable"></tbody>
+  </table>
+
+  <script>
+    fetch("http://127.0.0.1:5000/interests")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("intTable");
+        data.forEach(i => {
+          const row = document.createElement("tr");
+        row.innerHTML = `
+  <td>${i.INT_ID}</td>
+  <td>${i.USERS_ID}</td>
+  <td>${i.INTEREST}</td>
+`;
+          tbody.appendChild(row);
+        });
+      });
+  </script>
+</body>
+</html>

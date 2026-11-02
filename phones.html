@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Phones</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <h2>User Phone Numbers</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Phone Number</th>
+      </tr>
+    </thead>
+    <tbody id="phoneTable"></tbody>
+  </table>
+
+  <h3>Total of All Phone Numbers:</h3>
+  <div id="totalSum"></div>
+
+  <script>
+    // Fetch and display all phones
+    fetch('http://127.0.0.1:5000/phones')
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById('phoneTable');
+        data.forEach(p => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${p.USERS_ID}</td>
+            <td>${p.PHONE_NUMBER}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+
+    // Fetch and display total sum
+    fetch('http://127.0.0.1:5000/phones/total_sum')
+      .then(res => res.json())
+      .then(data => {
+        if (data.length > 0) {
+          document.getElementById('totalSum').textContent = data[0].total_sum;
+        } else {
+          document.getElementById('totalSum').textContent = '0';
+        }
+      });
+  </script>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Matches</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>All Matches</h2>
+  <input type="text" id="interestInput" placeholder="Enter interest, e.g. Singing">
+<button onclick="searchMatches()">Search Matches</button>
+<button onclick="loadAllMatches()">Reset</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Match ID</th>
+        <th>Matched On</th>
+        <th>User 1</th>
+        <th>User 2</th>
+        <th>Common Interest</th>
+      </tr>
+    </thead>
+    <tbody id="matchTable"></tbody>
+  </table>
+
+  <script>
+function loadAllMatches() {
+  fetch("http://127.0.0.1:5000/all_matches")
+    .then(res => res.json())
+    .then(renderMatches);
+}
+
+function searchMatches() {
+  const interest = document.getElementById("interestInput").value;
+  fetch(`http://127.0.0.1:5000/matches_by_interest/${interest}`)
+    .then(res => res.json())
+    .then(renderMatches);
+}
+
+function renderMatches(data) {
+  console.log("Matches Data:", data);  // add this
+  const tbody = document.getElementById("matchTable");
+  tbody.innerHTML = "";
+  data.forEach(m => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${m.M_ID}</td>
+      <td>${m.MATCHED_ON}</td>
+      <td>${m.USER1}</td>
+      <td>${m.USER2}</td>
+      <td>${m.common_interests || ""}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+
+// On page load
+loadAllMatches();
+
+
+
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Subscriptions</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>Subscriptions</h2>
+  <input type="text" id="statusInput" placeholder="Enter subscription status, e.g. Active" />
+  <button onclick="searchSubscriptions()">Search</button>
+  <button onclick="loadAllSubscriptions()">Reset</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Sub ID</th>
+        <th>User ID</th>
+        <th>Plan Type</th>
+        <th>Start Day</th>
+        <th>End Day</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody id="subTable"></tbody>
+  </table>
+
+  <script>
+    function loadAllSubscriptions() {
+      fetch("http://127.0.0.1:5000/subscriptions")
+        .then(res => res.json())
+        .then(renderSubscriptions);
+    }
+
+    function searchSubscriptions() {
+      const status = document.getElementById("statusInput").value.trim();
+      if (!status) {
+        loadAllSubscriptions();
+        return;
+      }
+      fetch(`http://127.0.0.1:5000/subscriptions_by_status/${status}`)
+        .then(res => res.json())
+        .then(renderSubscriptions);
+    }
+
+    function renderSubscriptions(data) {
+      const tbody = document.getElementById("subTable");
+      tbody.innerHTML = "";
+      data.forEach(s => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${s.SUB_ID}</td>
+          <td>${s.USERS_ID}</td>
+          <td>${s.PLAN_TYPE}</td>
+          <td>${s.START_DAY}</td>
+          <td>${s.END_DAY}</td>
+          <td>${s.SUB_STATUS}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    loadAllSubscriptions();
+  </script>
+</body>
+</html>

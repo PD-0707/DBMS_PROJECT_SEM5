@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reports</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>User Reports</h2>
+  <input type="text" id="reasonInput" placeholder="Enter reason (e.g. spam)">
+  <button onclick="searchReports()">Search</button>
+  <button onclick="loadAllReports()">Reset</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Report ID</th>
+        <th>Reporter</th>
+        <th>Reported User</th>
+        <th>Reason</th>
+        <th>Time</th>
+      </tr>
+    </thead>
+    <tbody id="reportTable"></tbody>
+  </table>
+
+  <script>
+    function loadAllReports() {
+      fetch("http://127.0.0.1:5000/reports")
+        .then(res => res.json())
+        .then(renderReports);
+    }
+
+    function searchReports() {
+      const reason = document.getElementById("reasonInput").value.trim();
+      if (!reason) {
+        loadAllReports();
+        return;
+      }
+      fetch(`http://127.0.0.1:5000/reports/reason/${reason}`)
+        .then(res => res.json())
+        .then(renderReports);
+    }
+
+    function renderReports(data) {
+      const tbody = document.getElementById("reportTable");
+      tbody.innerHTML = "";
+      data.forEach(r => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${r.REPORT_ID}</td>
+          <td>${r.REPORTER_ID}</td>
+          <td>${r.REPORTED_ID}</td>
+          <td>${r.REASON}</td>
+          <td>${r.REPORT_TIME || ''}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    // Initial load
+    loadAllReports();
+  </script>
+</body>
+</html>

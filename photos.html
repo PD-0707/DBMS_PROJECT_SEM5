@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Photos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>User Photos</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Photo ID</th>
+        <th>User ID</th>
+        <th>Photo URL</th>
+        <th>Upload Time</th>
+        <th>Caption</th>
+      </tr>
+    </thead>
+    <tbody id="photoTable"></tbody>
+  </table>
+
+  <script>
+    fetch("http://127.0.0.1:5000/photos")
+      .then(res => res.json())
+      .then(data => {
+        const tbody = document.getElementById("photoTable");
+        data.forEach(p => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${p.PHOTO_ID}</td>
+            <td>${p.USERS_ID}</td>
+            <td><a href="${p.PHOTO_URL}" target="_blank">View Photo</a></td>
+            <td>${p.UPLOAD_TIME}</td>
+            <td>${p.CAPTION}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  </script>
+</body>
+</html>

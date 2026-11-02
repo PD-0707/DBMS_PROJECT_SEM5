@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Preferences</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>User Preferences</h2>
+  <input type="number" id="minAgeInput" placeholder="Minimum Age" />
+  <button onclick="searchByMinAge()">Search by Min Age</button>
+  <button onclick="loadAllPreferences()">Reset</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Preference ID</th>
+        <th>User ID</th>
+        <th>Preferred Gender</th>
+        <th>Min Age</th>
+        <th>Max Age</th>
+      </tr>
+    </thead>
+    <tbody id="prefTable"></tbody>
+  </table>
+
+  <script>
+    // Load all prefs initially or on reset
+    function loadAllPreferences() {
+      fetch('http://127.0.0.1:5000/preference')
+        .then(res => res.json())
+        .then(renderPreferences)
+        .catch(e => console.error("Failed to load preferences:", e));
+    }
+
+    // Search prefs by minimum age
+    function searchByMinAge() {
+      const minAge = document.getElementById('minAgeInput').value;
+      if (!minAge) {
+        alert('Please enter a minimum age');
+        return;
+      }
+      fetch(`http://127.0.0.1:5000/preferences/min_age/${minAge}`)
+        .then(res => res.json())
+        .then(renderPreferences)
+        .catch(e => console.error("Failed to search preferences by min age:", e));
+    }
+
+    // Render preferences table body
+    function renderPreferences(data) {
+      const tbody = document.getElementById('prefTable');
+      tbody.innerHTML = '';
+      data.forEach(pref => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${pref.PREF_ID}</td>
+          <td>${pref.USER_ID}</td>
+          <td>${pref.PREFERRED_GENDER}</td>
+          <td>${pref.MIN_AGE}</td>
+          <td>${pref.MAX_AGE}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Initial load on page open
+    loadAllPreferences();
+  </script>
+</body>
+</html>

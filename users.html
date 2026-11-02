@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Users</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>All Users</h2>
+  <input type="text" id="prefixInput" placeholder="Enter name prefix (e.g. P)">
+  <button onclick="searchUsers()">Search</button>
+  <button onclick="loadAllUsers()">Reset</button>
+   <select id="genderSelect">
+    <option value="">Select Gender</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+  </select>
+  <button onclick="searchUsersByGender()">Search</button>
+  <button onclick="loadAllUsers()">Reset</button>
+  <table>
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Password</th>
+        <th>Bio</th>
+        <th>Gender</th>
+      </tr>
+    </thead>
+    <tbody id="userTable"></tbody>
+  </table>
+
+  <script>
+ fetch("http://127.0.0.1:5000/users")
+ function loadAllUsers() {
+  fetch("http://127.0.0.1:5000/users")
+    .then(res => res.json())
+    .then(renderUsers);
+}
+
+function searchUsers() {
+  const prefix = document.getElementById("prefixInput").value;
+  fetch(`http://127.0.0.1:5000/users_search/${prefix}`)
+    .then(res => res.json())
+    .then(renderUsers);
+}
+
+function renderUsers(data) {
+  const tbody = document.getElementById("userTable");
+  tbody.innerHTML = "";
+  data.forEach(u => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${u.USERS_ID}</td>
+      <td>${u.USERS_NAME}</td>
+      <td>${u.EMAIL}</td>
+      <td>${u.PASSWD}</td>
+      <td>${u.BIO}</td>
+      <td>${u.GENDER}</td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+function searchUsersByGender() {
+  const gender = document.getElementById("genderSelect").value;
+  if (gender === "") {
+    loadAllUsers();
+    return;
+  }
+  fetch(`http://127.0.0.1:5000/users/gender/${gender}`)
+    .then(res => res.json())
+    .then(renderUsers);
+}
+loadAllUsers();
+</script>
+</body>
+</html>

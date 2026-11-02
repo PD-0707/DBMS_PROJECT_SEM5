@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Locations</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h2>User Locations</h2>
+  <input id="cityInput" type="text" placeholder="Enter City Name" />
+<button onclick="searchUserCountByCity()">Search</button>
+<div id="result"></div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Location ID</th>
+        <th>User ID</th>
+        <th>City</th>
+        <th>Country</th>
+      </tr>
+    </thead>
+    <tbody id="locTable"></tbody>
+  </table>
+
+  <script>
+    function loadAllLocations() {
+  fetch("http://127.0.0.1:5000/locations")
+    .then(res => res.json())
+    .then(data => {
+      const tbody = document.getElementById("locTable");
+      tbody.innerHTML = "";
+      data.forEach(l => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${l.LOC_ID}</td>
+          <td>${l.USERS_ID}</td>
+          <td>${l.CITY}</td>
+          <td>${l.COUNTRY}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+}
+
+// Call it when the page loads
+loadAllLocations();
+
+    function searchUserCountByCity() {
+  const city = document.getElementById('cityInput').value.trim();
+  if (!city) {
+    alert('Please enter city name');
+    return;
+  }
+  fetch(`http://127.0.0.1:5000/locations/count_by_city/${encodeURIComponent(city)}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.length > 0) {
+        document.getElementById('result').innerHTML = 
+          `Users in ${city}: ${data[0].user_count}`;
+      } else {
+        document.getElementById('result').innerHTML = `No users found in ${city}`;
+      }
+    })
+    .catch(console.error);
+}
+  </script>
+</body>
+</html>

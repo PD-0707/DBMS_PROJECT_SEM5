@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="style.css">
+  <title>Dashboard - User Management</title>
+  <style>
+    form { margin-bottom: 20px; }
+    input, select, button { margin: 5px; }
+    table, th, td { border: 1px solid black; border-collapse: collapse; padding: 8px; }
+    table { width: 100%; margin-top: 20px;}
+    th { background-color: #9c63bb; color: white;}
+  </style>
+</head>
+<body>
+  <h1>User Dashboard</h1>
+
+  <!-- Add User -->
+  <form id="formAddUser">
+    <h3>Add User</h3>
+    <input id="addUserId" placeholder="User ID" required />
+    <input id="addUserName" placeholder="Name" required />
+    <input id="addUserEmail" placeholder="Email" type="email" required />
+    <input id="addUserPass" placeholder="Password" type="password" required />
+    <input id="addUserBio" placeholder="Bio" />
+    <select id="addUserGender">
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <button type="submit">Add User</button>
+  </form>
+
+  <!-- Update User -->
+  <form id="formUpdateUser">
+    <h3>Update User</h3>
+    <input id="updateUserId" placeholder="User ID" required />
+    <input id="updateUserName" placeholder="Name" />
+    <input id="updateUserEmail" placeholder="Email" type="email" />
+    <input id="updateUserPass" placeholder="Password" type="password" />
+    <input id="updateUserBio" placeholder="Bio" />
+    <select id="updateUserGender">
+      <option value="">Select Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <button type="submit">Update User</button>
+  </form>
+
+  <!-- Delete User -->
+  <form id="formDeleteUser">
+    <h3>Delete User</h3>
+    <input id="deleteUserId" placeholder="User ID" required />
+    <button type="submit">Delete User</button>
+  </form>
+
+  <!-- Users Table -->
+  <h2>All Users</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>User ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Bio</th>
+        <th>Gender</th>
+      </tr>
+    </thead>
+    <tbody id="usersTableBody"></tbody>
+  </table>
+
+  <script>
+    // Generic fetch wrapper for JSON
+    async function fetchJSON(url, options = {}) {
+      const resp = await fetch(url, options);
+      return resp.json();
+    }
+
+    // Load all users
+    async function loadUsers() {
+      const users = await fetchJSON("http://127.0.0.1:5000/users");
+      const tbody = document.getElementById("usersTableBody");
+      tbody.innerHTML = "";
+      users.forEach(u => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${u.USERS_ID}</td>
+          <td>${u.USERS_NAME}</td>
+          <td>${u.EMAIL}</td>
+          <td>${u.BIO}</td>
+          <td>${u.GENDER}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Add User Form Submit
+    document.getElementById("formAddUser").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const data = {
+        USERS_ID: document.getElementById("addUserId").value,
+        USERS_NAME: document.getElementById("addUserName").value,
+        EMAIL: document.getElementById("addUserEmail").value,
+        PASSWD: document.getElementById("addUserPass").value,
+        BIO: document.getElementById("addUserBio").value,
+        GENDER: document.getElementById("addUserGender").value
+      };
+      const response = await fetchJSON("http://127.0.0.1:5000/users", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      });
+      alert(response.message || response.error);
+      await loadUsers();
+      e.target.reset();
+    });
+
+    // Update User Form Submit
+    document.getElementById("formUpdateUser").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const userId = document.getElementById("updateUserId").value;
+      const data = {};
+      if(document.getElementById("updateUserName").value) data.USERS_NAME = document.getElementById("updateUserName").value;
+      if(document.getElementById("updateUserEmail").value) data.EMAIL = document.getElementById("updateUserEmail").value;
+      if(document.getElementById("updateUserPass").value) data.PASSWD = document.getElementById("updateUserPass").value;
+      if(document.getElementById("updateUserBio").value) data.BIO = document.getElementById("updateUserBio").value;
+      if(document.getElementById("updateUserGender").value) data.GENDER = document.getElementById("updateUserGender").value;
+
+      const response = await fetchJSON(`http://127.0.0.1:5000/users/${userId}`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      });
+      alert(response.message || response.error);
+      await loadUsers();
+      e.target.reset();
+      // After update success:
+alert('User updated');
+loadUsers();  // reload the users table with fresh data
+
+    });
+
+    // Delete User Form Submit
+    document.getElementById("formDeleteUser").addEventListener("submit", async e => {
+      e.preventDefault();
+      const userId = document.getElementById("deleteUserId").value;
+      const response = await fetchJSON(`http://127.0.0.1:5000/users/${userId}`, {
+        method: "DELETE"
+      });
+      alert(response.message || response.error);
+      await loadUsers();
+      e.target.reset();
+    });
+
+    // Initial load all users
+    loadUsers();
+  </script>
+</body>
+</html>
